@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Spatie\Permission\Models\Role;
 use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
@@ -19,20 +20,24 @@ class AuthController extends Controller
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8|confirmed',
         ]);
-    
+
         if ($validator->fails()) {
             return response()->json($validator->errors(), 422);
         }
-    
+
         try {
+            // Find the 'user' role
+            $userRole = Role::where('name', 'user')->first();
+            
             $user = User::create([
                 'name' => $request->name,
                 'email' => $request->email,
                 'password' => Hash::make($request->password),
+                'role_id' => $userRole->id, // Assign the user role ID
             ]);
-    
+
             $token = $user->createToken('auth_token')->accessToken;
-    
+
             return response()->json(['token' => $token], 200);
         } catch (\Exception $e) {
             \Log::error('Registration Error: ' . $e->getMessage());
@@ -43,21 +48,25 @@ class AuthController extends Controller
 
 
     public function login(Request $request)
-    {
-        $request->validate([
-            'email' => 'required|string|email',
-            'password' => 'required|string',
-        ]);
+{
+    $request->validate([
+        'email' => 'required|string|email',
+        'password' => 'required|string',
+    ]);
 
-        if (!Auth::attempt($request->only('email', 'password'))) {
-            return response()->json(['error' => 'Unauthorized'], 401);
-        }
-
-        $user = Auth::user();
-        return response()->json([
-            'token' => $user->createToken('Personal Access Token')->accessToken,
-        ]);
+    if (!Auth::attempt($request->only('email', 'password'))) {
+        return response()->json(['error' => 'Unauthorized'], 401);
     }
+
+    $user = Auth::user();
+    $token = $user->createToken('Personal Access Token')->accessToken;
+
+    return response()->json([
+        'token' => $token,
+        'role_id' => $user->role_id, 
+    ]);
+}
+
 
     public function logout(Request $request)
     {
