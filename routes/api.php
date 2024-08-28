@@ -1,7 +1,6 @@
 <?php
 
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
 
 
@@ -22,3 +21,7 @@ Route::middleware('auth:api')->group(function () {
     Route::put('/users/{user}', [UserController::class, 'update']);
     Route::delete('/users/{user}', [UserController::class, 'destroy']);
 });
+
+Route::middleware('auth:api')->get('/user-role', [AuthController::class, 'getUserRole']);
+
+Route::middleware('auth:api')->get('/me', [AuthController::class, 'me']);

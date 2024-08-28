@@ -63,7 +63,6 @@ class AuthController extends Controller
 
     return response()->json([
         'token' => $token,
-        'role_id' => $user->role_id, 
     ]);
 }
 
@@ -72,6 +71,29 @@ class AuthController extends Controller
     {
         $request->user()->token()->revoke();
         return response()->json(['message' => 'Logged out successfully']);
+    }
+    
+    public function getUserRole()
+    {
+        $user = Auth::user(); // Get the currently authenticated user
+    
+        if ($user) {
+            // Get all roles for the user
+            $roles = $user->getRoleNames(); // Returns a collection of role names
+    
+            return response()->json([
+                'roles' => $roles
+            ]);
+        }
+    
+        return response()->json([
+            'error' => 'User not authenticated'
+        ], 401);
+    }
+
+    public function me()
+{
+    return response()->json(Auth::user());
     }
 
     public function sendResetLinkEmail(Request $request)
