@@ -14,37 +14,40 @@ use Illuminate\Validation\ValidationException;
 class AuthController extends Controller
 {
     public function register(Request $request)
-    {
-        $validator = Validator::make($request->all(), [
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:8|confirmed',
+{
+    $validator = Validator::make($request->all(), [
+        'name' => 'required|string|max:255',
+        'email' => 'required|string|email|max:255|unique:users',
+        'password' => 'required|string|min:8|confirmed',
+    ]);
+
+    if ($validator->fails()) {
+        return response()->json($validator->errors(), 422);
+    }
+
+    try {
+        // Create the user
+        $user = User::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => Hash::make($request->password),
         ]);
 
-        if ($validator->fails()) {
-            return response()->json($validator->errors(), 422);
-        }
+        // Find the 'user' role
+        $userRole = Role::where('name', 'user')->first();
+        
+        // Assign the 'user' role to the newly created user
+        $user->assignRole($userRole);
 
-        try {
-            // Find the 'user' role
-            $userRole = Role::where('name', 'user')->first();
-            
-            $user = User::create([
-                'name' => $request->name,
-                'email' => $request->email,
-                'password' => Hash::make($request->password),
-                'role_id' => $userRole->id, // Assign the user role ID
-            ]);
+        // Create the token
+        $token = $user->createToken('auth_token')->accessToken;
 
-            $token = $user->createToken('auth_token')->accessToken;
-
-            return response()->json(['token' => $token], 200);
-        } catch (\Exception $e) {
-            \Log::error('Registration Error: ' . $e->getMessage());
-            return response()->json(['error' => $e->getMessage()], 500);
-        }
+        return response()->json(['token' => $token], 200);
+    } catch (\Exception $e) {
+        \Log::error('Registration Error: ' . $e->getMessage());
+        return response()->json(['error' => $e->getMessage()], 500);
     }
-    
+}
 
 
     public function login(Request $request)
