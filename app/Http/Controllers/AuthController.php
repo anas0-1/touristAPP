@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Facades\Log;
 
 class AuthController extends Controller
 {
@@ -118,29 +119,38 @@ class AuthController extends Controller
     }
 
     public function resetPassword(Request $request)
-    {
-        // Validate the request
-        $validator = Validator::make($request->all(), [
-            'token' => 'required|string',
-            'email' => 'required|string|email',
-            'password' => 'required|string|confirmed',
-        ]);
+{
+    // Validate the request
+    $validator = Validator::make($request->all(), [
+        'token' => 'required|string',
+        'email' => 'required|string|email',
+        'password' => 'required|string|confirmed',
+    ]);
 
-        if ($validator->fails()) {
-            return response()->json(['error' => $validator->errors()], 422);
-        }
+    if ($validator->fails()) {
+        return response()->json(['error' => $validator->errors()], 422);
+    }
 
-        // Attempt to reset the password
+    // Log the request data for debugging
+    Log::info('Reset Password Request Data', $request->all());
+
+    try {
         $response = Password::reset($request->only('email', 'password', 'password_confirmation', 'token'), function ($user, $password) {
             $user->password = bcrypt($password);
             $user->save();
         });
-
-        // Handle the response
         if ($response == Password::PASSWORD_RESET) {
             return response()->json(['message' => 'Password has been reset successfully.']);
         } else {
+            Log::error('Password Reset Response Error', ['response' => $response]);
             return response()->json(['error' => 'Unable to reset password.'], 500);
         }
-    }
+    } catch (\Exception $e) {
+        // Log the exception message
+        Log::error('Password Reset Exception', ['exception' => $e->getMessage()]);
+        return response()->json(['error' => 'An unexpected error occurred.'], 500);
+    } 
+}
+
+
 }

@@ -4,7 +4,8 @@ namespace App\Providers;
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
-
+use Illuminate\Auth\Notifications\ResetPassword;
+use App\Models\User;
 class AppServiceProvider extends ServiceProvider
 {
     /**
@@ -14,18 +15,20 @@ class AppServiceProvider extends ServiceProvider
     {
         //
     }
-
+   
     /**
      * Bootstrap any application services.
      */
     public function boot(): void
+    
     {
         $this->loadApiRoutes();
+        ResetPassword::createUrlUsing(function (User $user, string $token) {
+            return 'http://localhost:8080/reset-password?token='.$token;
+        });
     }
-
     protected function loadApiRoutes()
     {
-        // Assuming your custom api.php is located at routes/api.php
         Route::prefix('api')
             ->middleware('api')
             ->group(base_path('routes/api.php'));

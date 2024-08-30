@@ -8,12 +8,8 @@ use App\Http\Controllers\UserController;
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:api');
-Route::post('/password/email', [AuthController::class, 'sendResetLinkEmail']);
-Route::get('password/reset/{token}', function () {
-    return view('auth.reset');
-})->name('password.reset');
-
-Route::post('password/reset', [AuthController::class, 'resetPassword'])->name('password.update');
+Route::post('/password/email', [AuthController::class, 'sendResetLinkEmail'])->name('password.reset');
+Route::post('/password/reset', [AuthController::class, 'resetPassword'])->name('password.update');
 
 Route::middleware('auth:api')->group(function () {
     Route::get('/users', [UserController::class, 'index']);
