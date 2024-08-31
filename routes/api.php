@@ -20,3 +20,4 @@ Route::middleware('auth:api')->group(function () {
 
 Route::middleware('auth:api')->get('/user-role', [AuthController::class, 'getUserRole']);
 
+Route::middleware('auth:api')->get('/me', [AuthController::class, 'me']);
