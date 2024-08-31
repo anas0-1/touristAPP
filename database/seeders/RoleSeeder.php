@@ -28,8 +28,4 @@ class RoleSeeder extends Seeder
         $adminRole->givePermissionTo('manage users');
         $superAdminRole->givePermissionTo('manage users');
     }
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> 3f55ba82d508d831a57ca7f8fec0449b41e19245

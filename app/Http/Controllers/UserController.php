@@ -107,10 +107,4 @@ class UserController extends Controller
         }
         return response()->json(['error' => 'Unauthorized'], 403);
     }
-    
-<<<<<<< HEAD
 }
-=======
-}
-
->>>>>>> 3f55ba82d508d831a57ca7f8fec0449b41e19245
