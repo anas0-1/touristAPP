@@ -19,6 +19,10 @@ class Program extends Model
     {
         return $this->hasMany(Activity::class);
     }
+    public function media()
+    {
+        return $this->hasMany(Media::class);
+    }
 
     public function applications()
     {
