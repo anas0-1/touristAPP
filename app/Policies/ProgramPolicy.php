@@ -10,6 +10,23 @@ class ProgramPolicy
 {
     use HandlesAuthorization;
 
+    public function create(User $user) 
+    {
+        // If the user is an admin or super admin, allow unrestricted creation
+        if ($user->hasRole('admin') || $user->hasRole('super_admin')) {
+            return true;
+        }
+    
+        // For users with 'user' role, check the program count
+        if ($user->hasRole('user')) {
+            $programCount = $user->programs()->count();
+            return $programCount < 2;
+        }
+    
+        // If the user doesn't have any of these roles, deny creation
+        return false;
+    }
+
     /**
      * Determine if the user can update the program.
      *
