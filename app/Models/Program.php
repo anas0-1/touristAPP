@@ -21,21 +21,33 @@ class Program extends Model
         'starting_date' => 'date',
     ];
 
+    /**
+     * Get the user that owns the program.
+     */
     public function user()
     {
         return $this->belongsTo(User::class);
     }
 
+    /**
+     * Get the activities associated with the program.
+     */
     public function activities()
     {
         return $this->hasMany(Activity::class);
     }
 
+    /**
+     * Get the media associated with the program.
+     */
     public function media()
     {
         return $this->hasMany(Media::class);
     }
 
+    /**
+     * Get the applications associated with the program.
+     */
     public function applications()
     {
         return $this->hasMany(Application::class);

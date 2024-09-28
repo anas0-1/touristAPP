@@ -261,10 +261,6 @@ public function destroy($id)
         ], 500);
     }
 }
-
-
-
-
     public function applications(Program $program)
     {
         $applications = $program->applications()->with('user')->get();

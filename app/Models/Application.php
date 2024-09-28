@@ -6,7 +6,9 @@ use Illuminate\Database\Eloquent\Model;
 
 class Application extends Model
 {
-    protected $fillable = ['user_id', 'program_id'];
+    protected $fillable = [
+        'user_id', 'program_id', 'first_name', 'last_name', 'email', 'tickets',
+    ];
 
     public function program()
     {

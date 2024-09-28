@@ -70,9 +70,7 @@ class ActivityController extends Controller
     ]);
 
     // Update the activity
-    // For both store and update:
     $activity->update($request->only('name', 'description', 'time', 'duration', 'location'));
-
 
     // Return the updated activity
     return response()->json($activity);

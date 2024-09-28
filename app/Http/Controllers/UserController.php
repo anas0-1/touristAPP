@@ -12,13 +12,29 @@ class UserController extends Controller
 {
     // Only 'admin' and 'super_admin' can view users
     public function index(Request $request)
-    {
-        // Check if the authenticated user has 'admin' or 'super_admin' role
-        if ($request->user()->hasRole(['admin', 'super_admin'])) {
-            return response()->json(User::all(), 200);
-        }
-        return response()->json(['error' => 'Unauthorized'], 403);
+{
+    // Check if the authenticated user has 'admin' or 'super_admin' role
+    if ($request->user()->hasRole(['admin', 'super_admin'])) {
+        // Eager load the 'roles' relationship
+        $users = User::with('roles')->get();
+
+        // You can map over the users and return a custom response if needed
+        $usersWithRoles = $users->map(function ($user) {
+            return [
+                'id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
+                'roles' => $user->roles->pluck('name'), // Return only the role names
+                'created_at' => $user->created_at,
+            ];
+        });
+
+        return response()->json($usersWithRoles, 200);
     }
+
+    return response()->json(['error' => 'Unauthorized'], 403);
+}
+
     
     
     public function store(Request $request)
