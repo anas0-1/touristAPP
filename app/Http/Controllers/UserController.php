@@ -67,52 +67,41 @@ class UserController extends Controller
     }
     
     public function update(Request $request, User $user)
-    {
-        // Check if the authenticated user has 'admin' or 'super_admin' role
-        if ($request->user()->hasRole(['admin', 'super_admin'])) {
-            $validator = Validator::make($request->all(), [
-                'name' => 'sometimes|string|max:255',
-                'email' => 'sometimes|string|email|max:255|unique:users,email,' . $user->id,
-                'password' => 'sometimes|string|min:8|confirmed',
-                'role' => 'sometimes|string|in:user,admin,super_admin'
-            ]);
-    
-            if ($validator->fails()) {
-                return response()->json($validator->errors(), 422);
-            }
-    
-            if ($request->has('name')) {
-                $user->name = $request->name;
-            }
-    
-            if ($request->has('email')) {
-                $user->email = $request->email;
-            }
-    
-            if ($request->has('password')) {
-                $user->password = Hash::make($request->password);
-            }
-    
-            if ($request->has('role')) {
-                $currentUser = $request->user();
-    
-                // Check if the role assignment is allowed
-                if ($currentUser->hasRole('super_admin')) {
-                    $user->syncRoles([$request->role]);
-                } elseif ($currentUser->hasRole('admin') && in_array($request->role, ['user', 'admin'])) {
-                    // Admin can only assign 'user' or 'admin'
-                    $user->syncRoles([$request->role]);
-                } else {
-                    return response()->json(['error' => 'Unauthorized'], 403);
-                }
-            }
-    
-            $user->save();
-    
-            return response()->json($user, 200);
-        }
+{
+    // Check if the authenticated user can update this user
+    $currentUser = $request->user();
+
+    if (!$currentUser->hasRole(['admin', 'super_admin']) && $currentUser->id !== $user->id) {
         return response()->json(['error' => 'Unauthorized'], 403);
     }
+
+    $validator = Validator::make($request->all(), [
+        'name' => 'sometimes|string|max:255',
+        'email' => 'sometimes|string|email|max:255|unique:users,email,' . $user->id,
+        'password' => 'sometimes|string|min:8|confirmed',
+    ]);
+
+    if ($validator->fails()) {
+        return response()->json($validator->errors(), 422);
+    }
+
+    if ($request->has('name')) {
+        $user->name = $request->name;
+    }
+
+    if ($request->has('email')) {
+        $user->email = $request->email;
+    }
+
+    if ($request->has('password')) {
+        $user->password = Hash::make($request->password);
+    }
+
+    $user->save();
+
+    return response()->json($user, 200);
+}
+
     
     public function destroy(Request $request, User $user)
     {
