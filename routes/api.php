@@ -5,6 +5,8 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\ProgramController;
 use App\Http\Controllers\ActivityController;
 use App\Http\Controllers\ApplicationsController;
+use App\Http\Controllers\RatingController;
+
 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
@@ -25,6 +27,7 @@ Route::middleware('auth:api')->group(function () {
     Route::get('programs/{program}/activities/{activity}', [ActivityController::class, 'show']);
     Route::put('programs/{program}/activities/{activity}', [ActivityController::class, 'update']); 
     Route::delete('programs/{program}/activities/{activity}', [ActivityController::class, 'destroy']);
+    Route::post('/programs/{program}/rate', [RatingController::class, 'store']);
 });
 
 Route::middleware('auth:api')->group(function () {

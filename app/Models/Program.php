@@ -53,4 +53,13 @@ class Program extends Model
     {
         return $this->hasMany(Application::class);
     }
+    public function ratings()
+    {
+        return $this->hasMany(Rating::class);
+    }
+
+    public function averageRating()
+    {
+        return $this->ratings()->avg('rating') ?? 0;
+    }
 }

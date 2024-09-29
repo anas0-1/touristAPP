@@ -22,6 +22,13 @@ class ProgramController extends Controller
         $programs = Program::with('activities','media')->get();
         return response()->json($programs);
     }
+    private function formatProgramData(Program $program)
+    {
+        $formattedProgram = $program->toArray();
+        $formattedProgram['averageRating'] = $program->averageRating();
+        $formattedProgram['firstImage'] = $program->media->first() ? $program->media->first()->url : null;
+        return $formattedProgram;
+    }
     public function store(Request $request)
     {
         $user = Auth::user();
