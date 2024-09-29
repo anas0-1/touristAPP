@@ -19,6 +19,7 @@ class Program extends Model
     protected $casts = [
         'price' => 'decimal:2',
         'starting_date' => 'date',
+        'duration' => 'integer', 
     ];
 
     /**

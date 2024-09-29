@@ -103,7 +103,17 @@ class ApplicationsController extends Controller
 
         return response()->json(['message' => 'Application updated successfully', 'application' => $application], 200);
     }
+    public function getUserApplications()
+{
+    $user = auth()->user();
+    $applications = Application::with('program')
+        ->whereHas('program', function ($query) use ($user) {
+            $query->where('user_id', $user->id);
+        })
+        ->get();
 
+    return response()->json($applications);
+}
     // Delete an applicant (only accessible to program owner)
     public function destroy($programId, $applicationId)
     {

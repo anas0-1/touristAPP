@@ -10,11 +10,10 @@ use Illuminate\Support\Facades\Validator;
 
 class UserController extends Controller
 {
-    // Only 'admin' and 'super_admin' can view users
     public function index(Request $request)
 {
     // Check if the authenticated user has 'admin' or 'super_admin' role
-    if ($request->user()->hasRole(['admin', 'super_admin'])) {
+    if ($request->user()->hasRole(['admin', 'super_admin','user'])) {
         // Eager load the 'roles' relationship
         $users = User::with('roles')->get();
 
@@ -35,7 +34,11 @@ class UserController extends Controller
     return response()->json(['error' => 'Unauthorized'], 403);
 }
 
-    
+public function show(User $user)
+{
+    $user->load('programs'); 
+    return response()->json($user);
+}
     
     public function store(Request $request)
     {

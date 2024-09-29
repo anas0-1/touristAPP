@@ -14,6 +14,7 @@ Route::post('/password/reset', [AuthController::class, 'resetPassword'])->name('
 
 Route::middleware('auth:api')->group(function () {
     Route::get('/users', [UserController::class, 'index']);
+    Route::get('/users/{user}', [UserController::class, 'show']);
     Route::post('/users', [UserController::class, 'store']);
     Route::put('/users/{user}', [UserController::class, 'update']);
     Route::delete('/users/{user}', [UserController::class, 'destroy']);
@@ -35,6 +36,7 @@ Route::middleware('auth:api')->group(function () {
     // Update an application (only before the program starting date)
     Route::put('programs/{programId}/applications/{applicationId}', [ApplicationsController::class, 'update']);
     
+    Route::get('/user/applications', [ApplicationsController::class, 'getUserApplications']);
     // Delete an applicant (only program owner)
     Route::delete('programs/{programId}/applications/{applicationId}', [ApplicationsController::class, 'destroy']);
 });
