@@ -29,7 +29,7 @@ class ProgramControllerTest extends TestCase
         Role::firstOrCreate(['name' => 'admin', 'guard_name' => 'web']);
         Role::firstOrCreate(['name' => 'super_admin', 'guard_name' => 'web']);
         Role::firstOrCreate(['name' => 'user', 'guard_name' => 'web']);
-            $this->user = User::factory()->create();
+        $this->user = User::factory()->create();
         $this->user->assignRole('admin'); 
     }
     
@@ -42,7 +42,7 @@ class ProgramControllerTest extends TestCase
             'user_id' => $this->user->id,
             'name' => 'Sample Program',
             'description' => 'A great program.',
-            'duration' => 7,
+            'duration' => "7",
             'location' => 'Paris',
             'price' => 199.99,
             'starting_date' => '2024-09-30',
@@ -64,10 +64,10 @@ class ProgramControllerTest extends TestCase
         $this->assertDatabaseHas('programs', [
             'name' => 'Sample Program',
             'description' => 'A great program.',
-            'duration' => 7,
+            'duration' => 7, 
             'location' => 'Paris',
             'price' => 199.99,
-            'starting_date' => '2024-09-30',
+            'starting_date' => '2024-09-30 00:00:00', 
         ]);
         
         // Check if the activity was created in the database
