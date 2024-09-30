@@ -10,9 +10,11 @@ use App\Http\Controllers\RatingController;
 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
+Route::post('/v1/login', [AuthController::class, 'login']);
 Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:api');
 Route::post('/password/email', [AuthController::class, 'sendResetLinkEmail'])->name('password.reset');
 Route::post('/password/reset', [AuthController::class, 'resetPassword'])->name('password.update');
+
 
 Route::middleware('auth:api')->group(function () {
     Route::get('/users', [UserController::class, 'index']);
@@ -22,7 +24,7 @@ Route::middleware('auth:api')->group(function () {
     Route::delete('/users/{user}', [UserController::class, 'destroy']);
 
     Route::resource('programs', ProgramController::class);
-    Route::get('programs/{program}/activities', [ActivityController::class, 'index']);
+    Route::resource('v1/programs', ProgramController::class);
     Route::post('programs/{program}/activities', [ActivityController::class, 'store']);
     Route::get('programs/{program}/activities/{activity}', [ActivityController::class, 'show']);
     Route::put('programs/{program}/activities/{activity}', [ActivityController::class, 'update']); 

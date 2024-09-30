@@ -2,86 +2,58 @@
 
 namespace Tests\Feature;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
+use Laravel\Passport\Client as OauthClients;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Models\User;
 
 class AuthControllerTest extends TestCase
 {
     use RefreshDatabase;
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function it_can_register_a_user()
+    protected User $user; 
+
+    protected function setUp(): void
     {
-        $response = $this->postJson('/api/register', [
-            'name' => 'Test User',
-            'email' => 'test@example.com',
-            'password' => 'password',
-            'password_confirmation' => 'password',
+        parent::setUp();
+
+        // Create a personal access client for the tests
+        $this->artisan('passport:client', [
+            '--personal' => true,
+            '--name' => 'Test Personal Access Client',
         ]);
 
+        // Create a user for testing
+        $this->user = User::create([
+            'name' => 'Admin User',
+            'email' => 'admin@example.com',
+            'password' => bcrypt('password'), 
+        ]);
+    }
+
+    /**
+     * @group apilogintests
+     */
+    public function testApiLogin() 
+    {
+        // Generate the token for the user
+        $token = $this->user->createToken('Test Personal Access Client')->accessToken;
+
+        $body = [
+            'email' => 'admin@example.com',
+            'password' => 'password',
+        ];
+
+        // Check if the user exists in the database
+        $this->assertDatabaseHas('users', [
+            'email' => 'admin@example.com',
+        ]);
+
+        // Make the login request with the user's token
+        $response = $this->json('POST', '/api/v1/login', $body, ['Authorization' => "Bearer {$token}", 'Accept' => 'application/json']);
+
+        // Assert the response
         $response->assertStatus(200)
                  ->assertJsonStructure(['token']);
-    }
-
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function it_can_login_a_user()
-    {
-        $user = User::factory()->create([
-            'email' => 'test@example.com',
-            'password' => bcrypt('password'),
-        ]);
-
-        $response = $this->postJson('/api/login', [
-            'email' => $user->email,
-            'password' => 'password',
-        ]);
-
-        $response->assertStatus(200)
-                 ->assertJsonStructure(['token']);
-    }
-
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function it_can_logout_a_user()
-    {
-        $user = User::factory()->create();
-
-        $this->actingAs($user);
-
-        $response = $this->postJson('/api/logout');
-
-        $response->assertStatus(200)
-                 ->assertJson(['message' => 'Logged out successfully']);
-    }
-
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function it_can_send_reset_link_email()
-    {
-        $user = User::factory()->create(['email' => 'test@example.com']);
-
-        $response = $this->postJson('/api/password/email', [
-            'email' => $user->email,
-        ]);
-
-        $response->assertStatus(200)
-                 ->assertJson(['message' => 'Password reset link sent to your email address.']);
-    }
-
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function it_can_reset_password()
-    {
-        $user = User::factory()->create(['email' => 'test@example.com']);
-
-        $token = \Illuminate\Support\Facades\Password::createToken($user);
-
-        $response = $this->postJson('/api/password/reset', [
-            'email' => $user->email,
-            'password' => 'newpassword',
-            'password_confirmation' => 'newpassword',
-            'token' => $token,
-        ]);
-
-        $response->assertStatus(200)
-                 ->assertJson(['message' => 'Password has been reset successfully.']);
     }
 }

@@ -2,30 +2,18 @@
 
 namespace Database\Seeders;
 
-use Spatie\Permission\Models\Role;
-use Spatie\Permission\Models\Permission;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 
 class RoleSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run()
     {
-        // Create roles
-        Role::create(['name' => 'user']);
-        Role::create(['name' => 'admin']);
-        Role::create(['name' => 'super_admin']);
-
-        // Create a permission for managing users
-        Permission::create(['name' => 'manage users']);
-
-        // Assign permission to roles
-        $adminRole = Role::findByName('admin');
-        $superAdminRole = Role::findByName('super_admin');
-
-        $adminRole->givePermissionTo('manage users');
-        $superAdminRole->givePermissionTo('manage users');
+        // Insert roles into the roles table
+        DB::table('roles')->insert([
+            ['name' => 'user', 'guard_name' => 'web', 'created_at' => now(), 'updated_at' => now()],
+            ['name' => 'admin', 'guard_name' => 'web', 'created_at' => now(), 'updated_at' => now()],
+            ['name' => 'super_admin', 'guard_name' => 'web', 'created_at' => now(), 'updated_at' => now()],
+        ]);
     }
 }
